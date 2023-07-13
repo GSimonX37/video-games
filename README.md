@@ -63,7 +63,8 @@ Collect data about video games from various open sources. Analyze the distributi
     </tbody> 
 </table>
 
-## Acknowledgment
+## Thanks
+I would like to express my gratitude to [Irina Romanovsky](https://www.linkedin.com/in/irina-romanovsky-034338143/) ([GitHub](https://github.com/needsomecats)) for her help and support in creating this project.
 
 
 ## Help the project
