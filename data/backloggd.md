@@ -1,7 +1,7 @@
 # backloggd.сsv
 Data obtained by extracting them from the pages of a web resource **[backloggd.com](https://www.backloggd.com/)** using your own written parser program.
 
-## О веб-ресурсе backloggd.com
+## About the web resource backloggd.com
 "**Backloggd** is a place to keep your personal video game collection. Every game from every platform is here for you to log into your journal. Follow friends along the way to share your reviews and compare ratings. Then use filters to sort through your collection and see what matters to you. Keep a backlog of what you are currently playing and what you want to play, see the numbers change as you continue to log your playthroughs. There's Goodreads for books, Letterboxd for movies, and now Backloggd for games.
 
 All game related metadata comes from the community driven database **[IGDB](https://www.igdb.com/)**. This includes all game, company and platform data you see on the site." - from the site **[backloggd.com](https://www.backloggd.com/)**."
