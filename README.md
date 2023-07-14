@@ -29,7 +29,7 @@ Collect data about video games from various open sources. Analyze the distributi
                     <li>requests</li>
                 </ul> 
             </td>
-            <td><a href=data/backloggd.csv>Completed</a></td>
+            <td><a href=data/backloggd/backloggd.csv>Completed</a></td>
         </tr>
         <tr>
             <td style="text-align:center">2</td>
