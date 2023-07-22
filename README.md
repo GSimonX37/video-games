@@ -35,17 +35,17 @@ Collect data about video games from various open sources. Analyze the distributi
             <td style="text-align:center">2</td>
             <td>Exploratory analysis</td>
             <td>
-                <ul>
-                    <li>the distributions of the main variables are analyzed</li>
-                    <li>the analysis of the distribution of the rating of video games by
+                <ol>
+                    <li>The distributions of the main variables are analyzed.</li>
+                    <li>The analysis of the distribution of the rating of video games by:
                         <ul>
-                            <li>video game genres</li>
-                            <li>developers</li>
-                            <li>gaming platforms</li>
+                            <li>video game genres;</li>
+                            <li>developers;</li>
+                            <li>gaming platforms.</li>
                         </ul>
                     </li>
-                    <li>the dependence of the number of video game players was found</li>
-                </ul> 
+                    <li>The dependence of the number of video game players was found.</li>
+                </ol> 
             </td>
             <td> 
                 <ul>
@@ -61,9 +61,27 @@ Collect data about video games from various open sources. Analyze the distributi
         <tr>
             <td style="text-align:center">3</td>
             <td>Statistical analysis</td>
-            <td style="text-align:center">-</td>
-            <td style="text-align:center">-</td>
-            <td style="text-align:center"><a href=...>Progress</a></td>
+            <td>
+                <ol>
+                    <li>Statistical tests were carried out to compare the average ratings of video games for samples with different:</li>
+                        <ul>
+                            <li>video game genres (ANOVA, Tukey's post hoc test);</li>
+                            <li>developers (ANOVA, Tukey's post hoc test, Student's t-test);</li>
+                            <li>gaming platforms (ANOVA, Tukey's post hoc test).</li>
+                        </ul>
+                    </li>
+                </ol> 
+            </td>
+            <td> 
+                <ul>
+                    <li>matplotlib</li>
+                    <li>numpy</li>
+                    <li>pandas</li>
+                    <li>seaborn</li>
+                    <li>scipy</li>
+                </ul> 
+            </td>
+            <td style="text-align:center"><a href=notebooks/backloggd_sda.ipynb>Progress</a></td>
         </tr>
         <tr>
             <td style="text-align:center">4</td>
