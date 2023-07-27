@@ -1,8 +1,12 @@
 import aiohttp
 
+from .delay_manager import DelayManager
+
 
 class NetworkManager:
     def __init__(self):
+        self.delay_manager = DelayManager()
+
         self.url: str = 'https://www.backloggd.com'
         self.session: aiohttp.ClientSession | None = None
         self.incoming_traffic_size: int | None = 0
@@ -38,7 +42,12 @@ class NetworkManager:
 
             return response.status
 
+    async def set_delay(self, minimum_delay: list[int, int], delay_delta: int):
+        await self.delay_manager.set_delay(minimum_delay, delay_delta)
+
     async def get(self, link: str, params: dict = None):
+        await self.delay_manager.delay()
+
         async with self.session.get(link, params=params) as response:
             if response.status == 200:
                 self.statuses["successful"] += 1
@@ -49,6 +58,7 @@ class NetworkManager:
                     self.statuses["failed"][response.status] = 1
 
             self.incoming_traffic_size += int(response.headers['Content-Length'])
+            await self.delay_manager.send_response_status(response.status)
 
             return {'status': response.status, 'body': await response.text()}
 
@@ -61,6 +71,7 @@ class NetworkManager:
             failed += f'{" "*4}- {status:<6} {count:8};\n'
 
         return (f'incoming traffic size: {self.incoming_traffic_size / 2**20:.2f} MB;\n'
+                f'current delay: {self.delay_manager.current_delay[0]} to {self.delay_manager.current_delay[1]}\n'
                 f'{"successful":10} {self.statuses["successful"]:10};\n'
                 f'{"failed":10} {sum(self.statuses["failed"].values()):10};\n'
                 f'{failed}'

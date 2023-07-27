@@ -1,20 +1,16 @@
 import asyncio
 import os
-import time
 
 from bs4 import BeautifulSoup
-from random import uniform
 
 from game import Game
-from managers.delay_manager import DelayManager
 from managers.file_manager import FileManager
-from managers.network_manager import NetworkManager
+from managers.network_manager.network_manager import NetworkManager
 from managers.progress_manager import ProgressManager
 
 
 class Parser:
     def __init__(self):
-        self.delay_manager = DelayManager()
         self.file_manager = FileManager()
         self.network_manager = NetworkManager()
         self.progress_manager = ProgressManager()
@@ -29,10 +25,9 @@ class Parser:
 
         return status
 
-    def get_file_name(self):
-        self.file_manager.get_file_name()
-
     async def run(self):
+        await self.print_status()
+
         for (release, count_pages) in self.progress_manager.total_pages.items():
             for page in range(1, count_pages + 1):
 
@@ -45,25 +40,13 @@ class Parser:
                 self.progress_manager.step()
                 await self.print_status()
 
-                time.sleep(uniform(1, 5))
+    async def set_file_name(self):
+        await self.file_manager.set_file_name()
 
-    async def get_number_of_pages(self, link: str) -> None | int:
-        status, number, i = None, None, 0
+    async def set_delay(self, minimum_delay: list[int, int], delay_delta: int):
+        await self.network_manager.set_delay(minimum_delay, delay_delta)
 
-        while status != 200 and i < 5:
-            if i:
-                await asyncio.sleep(5)
-
-            response = await self.network_manager.get(link)
-            status = response['status']
-
-            if status == 200:
-                soup = BeautifulSoup(response['body'], 'html.parser')
-                number = int(soup.find_all('span', class_='page')[-2].next.text)
-
-        return number
-
-    async def get_number_of_all_pages(self) -> bool:
+    async def set_number_of_all_pages(self) -> bool:
         print('Getting data on the number of pages with video games...', end=' ', flush=True)
         tasks = []
 
@@ -80,14 +63,24 @@ class Parser:
             print('Failed to get game page count data.', end='', flush=True)
             return False
 
+    async def get_number_of_pages(self, link: str) -> None | int:
+        status, number, number_attempts = None, None, 0
+
+        while status != 200 and number_attempts < 5:
+            response = await self.network_manager.get(link)
+            status, number_attempts = response['status'], number_attempts + 1
+
+            if status == 200:
+                soup = BeautifulSoup(response['body'], 'html.parser')
+                number = int(soup.find_all('span', class_='page')[-2].next.text)
+
+        return number
+
     async def get_links_to_games(self, link: str, page: int) -> list[str]:
-        status, number_attempts = None, 0
+        status = None
         links = []
 
         while status != 200:
-            if number_attempts:
-                await asyncio.sleep(number_attempts * 10)
-
             response = await self.network_manager.get(link, params={'page': f'{page}'})
             status = response['status']
 
@@ -100,22 +93,16 @@ class Parser:
                     links.append(f'{self.network_manager.url}/games/{name}/')
 
                 await self.print_status()
-                number_attempts += 1
 
         return links
 
     async def get_game_data(self, link_to_game: str, release: str) -> Game:
-        await asyncio.sleep(uniform(1, 10))
-
         status, number_attempts = None, 0
         game = Game(release)
 
         while status != 200:
             if number_attempts > 3 and status != 429:
                 return game
-
-            if number_attempts:
-                await asyncio.sleep(number_attempts * 10)
 
             response = await self.network_manager.get(link_to_game)
             status = response['status']
