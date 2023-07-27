@@ -8,7 +8,7 @@ class FileManager:
         self.file_size: int | None = None
         self.number_of_records: int | None = None
 
-    def get_file_name(self):
+    async def set_file_name(self):
         # file_name = input('Enter the full name of the file to save the data: ')
         self.file_name = r'output.csv'
         self.file_size, self.number_of_records = 0, 0
