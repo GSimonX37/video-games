@@ -16,12 +16,12 @@ class Parser:
         self.progress_manager = ProgressManager()
 
     async def connect(self):
-        print('Server connection...', end=' ', flush=True)
+        print('Parser: server connection...', flush=True)
 
         if (status := await self.network_manager.connect()) == 200:
-            print(f'Connecting to the server successfully.', flush=True)
+            print(f'Parser: connecting to the server successfully.', flush=True)
         else:
-            print(f'Connection to server failed (code {status}).', flush=True)
+            print(f'Parser: connection to server failed (code {status}).', flush=True)
 
         return status
 
@@ -40,7 +40,7 @@ class Parser:
                 self.progress_manager.step()
                 await self.print_status()
 
-    async def set_file_name(self, file_name: str = ''):
+    async def configure_file_manager(self, file_name: str = ''):
         await self.file_manager.set_file_name(file_name)
 
     async def set_delay(self, minimum_delay: list[int, int], delay_delta: int):

@@ -9,11 +9,17 @@ class FileManager:
         self.number_of_records: int | None = None
 
     async def set_file_name(self, file_name: str = ''):
-        self.file_name = input('Enter the full name of the file to save the data: ') if not file_name else file_name
+        if file_name:
+            self.file_name = file_name
+        else:
+            self.file_name = input('File manager: enter the full name of the file to save the data: ')
 
         try:
-            print(f'A file named {self.file_name} already exists ({os.path.getsize(self.file_name) / 2**10:.2f} KB).')
-            if input('Press Enter to continue writing to this file or type "rewrite" to erase all data in the file: ') == 'rewrite':
+            file_size = os.path.getsize(self.file_name)
+            print(f'File manager: a file named {self.file_name} already exists ({file_size / 2**10:.2f} KB).')
+
+            if input('File manager: press "Enter" to continue writing to this file '
+                     'or type "rewrite" to erase all data in the file: ') == 'rewrite':
                 self.create_file()
             else:
                 with open(self.file_name, 'r', newline='', encoding='utf-8') as csvfile:
