@@ -12,7 +12,7 @@ class FileManager:
         self.file_name = input('Enter the full name of the file to save the data: ') if not file_name else file_name
 
         try:
-            print(f'A file named {self.file_name} already exists ({os.path.getsize(file_name) / 2**10:.2f} KB).')
+            print(f'A file named {self.file_name} already exists ({os.path.getsize(self.file_name) / 2**10:.2f} KB).')
             if input('Press Enter to continue writing to this file or type "rewrite" to erase all data in the file: ') == 'rewrite':
                 self.create_file()
             else:
@@ -20,7 +20,7 @@ class FileManager:
                     rows = csv.reader(csvfile, delimiter=';')
                     self.number_of_records = sum([1 for _ in rows]) - 1
 
-                self.file_size = os.path.getsize(file_name)
+                self.file_size = os.path.getsize(self.file_name)
         except WindowsError:
             self.create_file()
 
