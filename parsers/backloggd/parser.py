@@ -40,8 +40,8 @@ class Parser:
                 self.progress_manager.step()
                 await self.print_status()
 
-    async def set_file_name(self):
-        await self.file_manager.set_file_name()
+    async def set_file_name(self, file_name: str):
+        await self.file_manager.set_file_name(file_name)
 
     async def set_delay(self, minimum_delay: list[int, int], delay_delta: int):
         await self.network_manager.set_delay(minimum_delay, delay_delta)
