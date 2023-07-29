@@ -21,12 +21,13 @@ class ProgressBar:
         self.percents = 100 / self.maximum * self.current
         self.bars = int(self.percents)
 
-    def set(self, maximum: int):
-        self.current = 0
+    def set(self, current: int, maximum: int):
+        self.current = current
         self.maximum = maximum
-        self.bars = 0
+        self.percents = 100 / maximum * current
+        self.bars = int(self.percents)
         self.speed = None
-        self.previous_time = time.time()
+        # self.previous_time = time.time()
         self.time_left = None
 
     def for_print(self, name: str):
@@ -44,38 +45,39 @@ class ProgressBar:
 class ProgressManager:
     def __init__(self):
         self.current_release: str | None = None
-        self.current_status: str | None = None
-        self.current_pages: dict[str: int] = {}
-        self.total_pages: dict[str: int] = {}
-        self.releases: list[str] = []
+        self.progress: dict[str: list[int, int]] = {}
         self.release_progress_bar = ProgressBar()
         self.overall_progress_bar = ProgressBar()
 
-    def set_total_number_of_pages(self, releases: list[str], numbers_of_pages: list[int]):
-        self.releases = releases
-        self.current_release = releases[0]
-        self.total_pages = {release: count_pages for release, count_pages in zip(releases, numbers_of_pages)}
-        self.current_pages = {release: 0 for release in releases}
-
-        self.release_progress_bar.set(self.total_pages[self.current_release])
-        self.overall_progress_bar.set(sum(self.total_pages.values()))
+    def set_progress(self, progress: dict[str: list[int, int]]):
+        for (release, (current, last)) in progress.items():
+            if current != last:
+                self.current_release = release
+                break
+        self.progress = progress
+        self.release_progress_bar.set(*progress[self.current_release])
+        self.overall_progress_bar.set(sum([current for (current, last) in progress.values()]),
+                                      sum([last for (current, last) in progress.values()]))
 
     def step(self):
-        self.current_pages[self.current_release] += 1
+        self.progress[self.current_release][0] += 1
         self.release_progress_bar.step()
         self.overall_progress_bar.step()
-
-        if self.current_pages[self.current_release] == self.total_pages[self.current_release]:
-            next_index = self.releases.index(self.current_release) + 1
-            if next_index < len(self.releases):
-                self.current_release = self.releases[next_index]
-                self.release_progress_bar.set(self.total_pages[self.current_release])
+        if self.progress[self.current_release][0] == self.progress[self.current_release][1]:
+            for (release, (current, last)) in self.progress.items():
+                if current != last:
+                    self.current_release = release
+                    self.release_progress_bar.set(0, self.progress[self.current_release][1])
+                    break
 
     def for_print(self) -> str:
-        releases = ''
-        for (release, current), total in zip(self.current_pages.items(), self.total_pages.values()):
-            releases += f'{release:20} {current:5} of {total:5};\n'
-        releases += f'{"total":20} {sum(self.current_pages.values()):5} of {sum(self.total_pages.values()):5}.'
+        releases, total_current, total_last = '', 0, 0
+        for release, (current, last) in self.progress.items():
+            releases += f'{release:20} {current:5} of {last:5};\n'
+
+        total_current = sum([current for (current, last) in self.progress.values()])
+        total_last = sum([last for (current, last) in self.progress.values()])
+        releases += f'{"total":20} {total_current:5} of {total_last:5}.'
 
         return (f'{releases}\n'
                 f'{self.release_progress_bar.for_print("release")}\n'
