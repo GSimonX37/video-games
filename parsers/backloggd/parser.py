@@ -66,15 +66,21 @@ class Parser:
             elif all([isinstance(page, list) for page in pages.values()]):
                 progress = pages
         else:
-            last_pages = await self.get_last_page_numbers((*pages.keys(),))
+            last_pages = await self.get_last_page_numbers((*self.releases.keys(),))
 
             for (release, last_page) in zip(self.releases.keys(), last_pages):
                 progress[release] = [0, last_page]
 
         self.progress_manager.set_progress(progress)
 
-    async def set_delay(self, minimum_delay: list[int, int], delay_delta: int):
-        await self.network_manager.set_delay(minimum_delay, delay_delta)
+    async def configure_network_manager(self, delay: [int, int] = None):
+        if delay:
+            request_delay = delay
+        else:
+            request_delay = input('Network manager: enter the minimum and maximum delay before requests: ')
+            request_delay = [*map(int, request_delay.split())]
+
+        await self.network_manager.set_delay(request_delay)
 
     async def get_last_page_numbers(self, releases: tuple[str]) -> tuple[int]:
         print('Parser: getting data on the number of pages with video games...', flush=True)
