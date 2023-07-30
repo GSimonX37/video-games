@@ -22,10 +22,10 @@ Collect data about video games from various open sources. Analyze the distributi
             <td style="text-align:center">1</td>
             <td style="text-align:center" rowspan="4"><a href=data/backloggd/backloggd.md>Data</a> from the site <br> <a href=https://www.backloggd.com>backloggd.com</a></td>
             <td>Data collection</td>
-            <td>Using your own written parser program, get data by extracting it from the pages of a web resource.</td>
+            <td>Using your own written <a href=parsers/backloggd/backloggd.md>parser program</a>, get data by extracting it from the pages of a web resource.</td>
             <td> 
                 <ul>
-                    <li>bs4</li>
+                    <li>aiohttp</li>
                     <li>requests</li>
                 </ul> 
             </td>
