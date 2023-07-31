@@ -57,7 +57,7 @@ class NetworkManager:
                 else:
                     self.statuses["failed"][response.status] = 1
 
-            self.incoming_traffic_size += int(response.headers['Content-Length'])
+            self.incoming_traffic_size += int(response.headers.get('Content-Length', 0))
 
             return {'status': response.status, 'body': await response.text()}
 
