@@ -149,11 +149,14 @@ class Parser:
         game = Game(release)
 
         while status != 200:
-            if number_attempts > 3 and status != 429:
+            if number_attempts > 5 and status != 429:
                 return game
 
             response = await self.network_manager.get(link_to_game)
             status = response['status']
+
+            await self.print_status()
+            number_attempts += 1
 
             if status == 200:
                 text = response['body']
@@ -161,8 +164,21 @@ class Parser:
                 soup = soup.find('div', class_='row', id='game-profile')
                 await game.basic_data_parsing(soup)
 
-            await self.print_status()
-            number_attempts += 1
+                status, link_to_statistic = None, link_to_game.replace('games', 'logs') + 'plays/'
+                while status != 200:
+                    if number_attempts > 5 and status != 429:
+                        return game
+
+                    response = await self.network_manager.get(link_to_statistic)
+                    status = response['status']
+
+                    await self.print_status()
+                    number_attempts += 1
+
+                    if status == 200:
+                        text = response['body']
+                        soup = BeautifulSoup(text, 'html.parser')
+                        await game.get_statistic(soup)
 
         return game
 

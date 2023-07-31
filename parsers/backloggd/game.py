@@ -147,6 +147,11 @@ class Game:
         except ValueError:
             return
 
+    async def get_statistic(self, soup: BeautifulSoup):
+        statistic = soup.find('div', id='plays-nav').find_all('a')
+        statistic = [*map(lambda x: x.text, statistic)]
+        self.plays, self.playing, self.backlogs, self.wishlists = [int(s.split()[1]) for s in statistic]
+
     def for_csv(self):
         return [
             self.name,
