@@ -57,9 +57,11 @@ class NetworkManager:
                 else:
                     self.statuses["failed"][response.status] = 1
 
-            self.incoming_traffic_size += int(response.headers.get('Content-Length', 0))
-
-            return {'status': response.status, 'body': await response.text()}
+            if response.status != 404:
+                self.incoming_traffic_size += int(response.headers['Content-Length'])
+                return {'status': response.status, 'body': await response.text()}
+            else:
+                return {'status': response.status, 'body': ''}
 
     def get_link_page(self, release: str):
         return f'{self.url}/games/lib/release:asc/release_year:released;category:{self.releases[release]}'
