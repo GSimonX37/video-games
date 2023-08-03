@@ -8,27 +8,17 @@ class FileManager:
         self.file_size: int | None = None
         self.number_of_records: int | None = None
 
-    async def set_file_name(self, file_name: str = ''):
-        if file_name:
-            self.file_name = file_name
-        else:
-            self.file_name = input('File manager: enter the full name of the file to save the data: ')
+    async def set_file_name(self, file_name: str, mode: str):
+        self.file_name = file_name
 
-        try:
-            file_size = os.path.getsize(self.file_name)
-            print(f'File manager: a file named {self.file_name} already exists ({file_size / 2**10:.2f} KB).')
-
-            if input('File manager: press "Enter" to continue writing to this file '
-                     'or type "rewrite" to erase all data in the file: ') == 'rewrite':
-                self.create_file()
-            else:
-                with open(self.file_name, 'r', newline='', encoding='utf-8') as csvfile:
-                    rows = csv.reader(csvfile, delimiter=';')
-                    self.number_of_records = sum([1 for _ in rows]) - 1
-
-                self.file_size = os.path.getsize(self.file_name)
-        except WindowsError:
+        if mode == 'w':
             self.create_file()
+        elif mode == 'a':
+            with open(self.file_name, 'r', newline='', encoding='utf-8') as csvfile:
+                rows = csv.reader(csvfile, delimiter=';')
+                self.number_of_records = sum([1 for _ in rows]) - 1
+
+            self.file_size = os.path.getsize(self.file_name)
 
     def create_file(self):
         with open(self.file_name, 'w', newline='', encoding='utf-8') as csvfile:

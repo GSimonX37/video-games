@@ -53,34 +53,66 @@ class Parser:
                 self.progress_manager.step()
                 await self.print_status()
 
-    async def configure_file_manager(self, file_name: str = ''):
-        await self.file_manager.set_file_name(file_name)
+    async def configure_file_manager(self, file_name: str, mode: str):
+        await self.file_manager.set_file_name(file_name, mode)
 
-    async def configure_progress_manager(self, pages: dict[str: list | int] = None):
+    async def configure_progress_manager(self, releases: list | str = None, pages: list = None):
         progress = {}
-        if pages:
-            if all([isinstance(page, int) for page in pages.values()]):
-                last_pages = await self.get_last_page_numbers((*pages.keys(),))
-                for (release, current_page), last_page in zip(pages.items(), last_pages):
-                    progress[release] = [current_page, last_page]
-            elif all([isinstance(page, list) for page in pages.values()]):
-                progress = pages
+
+        if releases or pages:
+            if releases:
+                if isinstance(releases, list):
+                    progress = {release: [None, None] for release in releases}
+                elif isinstance(releases, str):
+                    progress = {releases: [None, None]}
+            else:
+                progress = {release: [None, None] for release in self.releases}
+
+            if pages:
+                empty = []
+
+                if all([isinstance(page, list) for page in pages]):
+                    for release, (first_page, last_page) in zip(progress, pages):
+                        progress[release][0] = first_page
+                        if last_page:
+                            progress[release][1] = last_page
+                        else:
+                            empty.append(release)
+
+                    if empty:
+                        last_pages = await self.get_last_page_numbers((*empty,))
+
+                        i = 0
+                        for release in progress:
+                            if not progress[release][1]:
+                                progress[release][1] = last_pages[i]
+                                i += 1
+
+                elif isinstance(pages, list):
+                    first_page, last_page = pages
+
+                    if last_page:
+                        for release in progress:
+                            progress[release][0], progress[release][1] = first_page, last_page
+                    else:
+                        last_pages = await self.get_last_page_numbers((*progress.keys(),))
+
+                        for release, last_page in zip(progress, last_pages):
+                            progress[release][0], progress[release][1] = first_page, last_page
+            else:
+                last_pages = await self.get_last_page_numbers((*progress.keys(),))
+
+                for release, last_page in zip(progress, last_pages):
+                    progress[release] = [0, last_page]
+
         else:
             last_pages = await self.get_last_page_numbers((*self.releases.keys(),))
-
-            for (release, last_page) in zip(self.releases.keys(), last_pages):
-                progress[release] = [0, last_page]
+            progress = {release: [0, last_page] for release, last_page in zip(self.releases.keys(), last_pages)}
 
         self.progress_manager.set_progress(progress)
 
-    async def configure_network_manager(self, delay: [int, int] = None):
-        if delay:
-            request_delay = delay
-        else:
-            request_delay = input('Network manager: enter the minimum and maximum delay before requests: ')
-            request_delay = [*map(int, request_delay.split())]
-
-        await self.network_manager.set_delay(request_delay)
+    async def configure_network_manager(self, delay: [int, int]):
+        await self.network_manager.set_delay(delay)
 
     async def get_last_page_numbers(self, releases: tuple[str]) -> tuple[int]:
         print('Parser: getting data on the number of pages with video games...', flush=True)
