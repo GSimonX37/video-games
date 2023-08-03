@@ -8,7 +8,7 @@ async def main():
 
     if await parser.connect() == 200:
         await parser.configure_file_manager('output.csv', 'a')
-        await parser.configure_progress_manager(pages=[0, 5])
+        await parser.configure_progress_manager(releases=['main', 'dlc'], pages=[1, 5])
         await parser.configure_network_manager([15, 20])
         await parser.print_status()
 

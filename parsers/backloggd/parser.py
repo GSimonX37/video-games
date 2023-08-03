@@ -42,7 +42,7 @@ class Parser:
         await self.print_status()
 
         for release, (current, last) in self.progress_manager.progress.items():
-            for page in range(1, last + 1):
+            for page in range(current, last + 1):
 
                 link_page = self.network_manager.get_link_page(release)
                 links_to_games = await self.get_links_to_games(link_page, page)
@@ -103,11 +103,11 @@ class Parser:
                 last_pages = await self.get_last_page_numbers((*progress.keys(),))
 
                 for release, last_page in zip(progress, last_pages):
-                    progress[release] = [0, last_page]
+                    progress[release] = [1, last_page]
 
         else:
             last_pages = await self.get_last_page_numbers((*self.releases.keys(),))
-            progress = {release: [0, last_page] for release, last_page in zip(self.releases.keys(), last_pages)}
+            progress = {release: [1, last_page] for release, last_page in zip(self.releases.keys(), last_pages)}
 
         self.progress_manager.set_progress(progress)
 
