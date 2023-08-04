@@ -11,8 +11,8 @@ class Game:
         self.platforms: list | None = None
         self.developers: list | None = None
         self.rating: float | None = None
+        self.votes: list[int] | None = None
         self.release: str = release
-        self.main: str | None = None
         self.reviews: int | None = None
         self.plays: int | None = None
         self.playing: int | None = None
@@ -25,11 +25,11 @@ class Game:
         await self.get_date(soup)
         await self.get_companies(soup)
         await self.get_rating(soup)
+        await self.get_votes(soup)
         await self.get_reviews(soup)
         await self.get_platform(soup)
         await self.get_genres(soup)
         await self.get_description(soup)
-        self.main = await self.get_release(soup) if self.release != 'main' else self.name
 
     async def get_name(self, soup: BeautifulSoup):
         try:
@@ -73,6 +73,13 @@ class Game:
             return
         except ValueError:
             return
+
+    async def get_votes(self, soup: BeautifulSoup):
+        votes = (soup
+                 .find(class_='side-section')
+                 .find('div', id='ratings-bars-height')
+                 .find_all('div'))
+        self.votes = [vote['data-tippy-content'].split()[0] for vote in votes[::2]]
 
     async def get_reviews(self, soup: BeautifulSoup):
         try:
@@ -135,18 +142,6 @@ class Game:
         except ValueError:
             return
 
-    async def get_release(self, soup: BeautifulSoup):
-        try:
-            self.release = (soup
-                            .find('div', id='center-content')
-                            .find('p', class_='mb-2 game-parent-category')
-                            .find('a')
-                            .text)
-        except AttributeError:
-            return
-        except ValueError:
-            return
-
     async def get_statistic(self, soup: BeautifulSoup):
         statistic = soup.find('div', id='plays-nav').find_all('a')
         statistic = [*map(lambda x: x.text, statistic)]
@@ -158,10 +153,10 @@ class Game:
             self.date,
             self.developers,
             self.rating,
+            self.votes,
             self.platforms,
             self.genres,
             self.release,
-            self.main,
             self.reviews,
             self.plays,
             self.playing,
