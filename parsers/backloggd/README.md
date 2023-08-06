@@ -127,3 +127,5 @@ To configure the network manager, call the configure_network_manager method of t
 await parser.configure_network_manager([15, 20])
 ```  
 This method will pass to the network manager, which in turn will pass to the delay manager, a range of integers that will be used when generating a **random delay** before sending a request to the server. This approach is necessary in order not to exceed the request limit, otherwise the server will return responses with a status of **429**. It makes sense to reduce the delay range when using a proxy.
+
+[Project information](../../README.md)
