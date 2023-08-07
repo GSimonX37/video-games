@@ -89,3 +89,6 @@ class ProgressManager:
         return (f'{releases}\n'
                 f'{self.release_progress_bar.for_print("release")}\n'
                 f'{self.overall_progress_bar.for_print("overall")}')
+
+    def for_json(self) -> dict:
+        return self.progress
