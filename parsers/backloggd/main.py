@@ -7,9 +7,9 @@ async def main():
     parser = Parser()
 
     if await parser.connect() == 200:
-        await parser.configure_file_manager('output.csv', 'w')
-        await parser.configure_progress_manager(releases='main', pages=[1, 2])
-        await parser.configure_network_manager([5, 10])
+        await parser.file_manager_setting('output.csv', 'w')
+        await parser.progress_manager_setting(releases='main', pages=[1, 2])
+        await parser.network_manager_setting([5, 10])
         await parser.print_status()
 
         if not input('Press enter to start...'):

@@ -53,10 +53,10 @@ class Parser:
                 self.progress_manager.step()
                 await self.print_status()
 
-    async def configure_file_manager(self, file_name: str, mode: str):
+    async def file_manager_setting(self, file_name: str, mode: str):
         await self.file_manager.set_file_name(file_name, mode)
 
-    async def configure_progress_manager(self, releases: list | str = None, pages: list = None):
+    async def progress_manager_setting(self, releases: list | str = None, pages: list = None):
         progress = {}
 
         if releases or pages:
@@ -111,7 +111,7 @@ class Parser:
 
         self.progress_manager.set_progress(progress)
 
-    async def configure_network_manager(self, delay: [int, int]):
+    async def network_manager_setting(self, delay: [int, int]):
         await self.network_manager.set_delay(delay)
 
     async def get_last_page_numbers(self, releases: tuple[str]) -> tuple[int]:
