@@ -48,13 +48,15 @@ class Parser:
                 links_to_games = await self.get_links_to_games(link_page, page)
                 games = await self.get_games_data(links_to_games, release)
 
-                self.file_manager.write([game.for_csv() for game in games])
+                self.file_manager.write_data([game.for_csv() for game in games])
 
                 self.progress_manager.step()
                 await self.print_status()
+                await self.save_settings()
 
-    async def file_manager_setting(self, file_name: str, mode: str):
-        await self.file_manager.set_file_name(file_name, mode)
+    async def file_manager_setting(self, data_file_name: str, mode: str, settings_file_name: str = 'settings.json'):
+        await self.file_manager.set_data_file_name(data_file_name, mode)
+        await self.file_manager.set_configuration_file_name(settings_file_name)
 
     async def progress_manager_setting(self, releases: list | str = None, pages: list = None):
         progress = {}
@@ -216,6 +218,10 @@ class Parser:
 
     async def close_connection(self):
         await self.network_manager.session.close()
+
+    async def save_settings(self):
+        settings = self.progress_manager.for_json()
+        self.file_manager.write_settings(settings)
 
     async def print_status(self):
         os.system('cls')
