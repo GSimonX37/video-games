@@ -56,7 +56,7 @@ class FileManager:
         self.file_size = os.path.getsize(self.data_file_name)
         self.number_of_records += len(records)
 
-    def write_settings(self, configuration: dict):
+    def write_checkpoint(self, configuration: dict):
         if self.settings_file_name:
             with open(self.settings_file_name, 'w') as json_file:
                 settings = self.for_json() | configuration

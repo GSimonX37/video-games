@@ -52,7 +52,7 @@ class Parser:
 
                 self.progress_manager.step()
                 await self.print_status()
-                await self.save_settings()
+                await self.save_checkpoint()
 
     async def file_manager_setting(self, data_file_name: str, mode: str, settings_file_name: str = 'settings.json'):
         await self.file_manager.set_data_file_name(data_file_name, mode)
@@ -219,9 +219,9 @@ class Parser:
     async def close_connection(self):
         await self.network_manager.session.close()
 
-    async def save_settings(self):
+    async def save_checkpoint(self):
         settings = self.progress_manager.for_json()
-        self.file_manager.write_settings(settings)
+        self.file_manager.write_checkpoint(settings)
 
     async def print_status(self):
         os.system('cls')
