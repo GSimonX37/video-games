@@ -42,7 +42,7 @@ class NetworkManager:
 
             return response.status
 
-    async def set_delay(self, delay: list[int, int]):
+    async def set_delay(self, delay: tuple[int, int]):
         await self.delay_manager.set_delay(delay)
 
     async def get(self, link: str, params: dict = None):

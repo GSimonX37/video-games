@@ -54,9 +54,16 @@ class Parser:
                 await self.print_status()
                 await self.save_checkpoint()
 
-    async def file_manager_setting(self, data_file_name: str, mode: str, settings_file_name: str = 'settings.json'):
+    async def settings(self, data_file_name: str, mode: str, checkpoint_file_name: str = 'checkpoint.json',
+                       releases: list | str = None, pages: list = None,
+                       delay: [int, int] = (5, 10)):
+        await self.file_manager_setting(data_file_name, mode, checkpoint_file_name)
+        await self.progress_manager_setting(releases, pages)
+        await self.network_manager_setting(delay)
+
+    async def file_manager_setting(self, data_file_name: str, mode: str, checkpoint_file_name: str = 'checkpoint.json'):
         await self.file_manager.set_data_file_name(data_file_name, mode)
-        await self.file_manager.set_configuration_file_name(settings_file_name)
+        await self.file_manager.set_configuration_file_name(checkpoint_file_name)
 
     async def progress_manager_setting(self, releases: list | str = None, pages: list = None):
         progress = {}
@@ -113,7 +120,7 @@ class Parser:
 
         self.progress_manager.set_progress(progress)
 
-    async def network_manager_setting(self, delay: [int, int]):
+    async def network_manager_setting(self, delay: tuple[int, int] = (5, 10)):
         await self.network_manager.set_delay(delay)
 
     async def get_last_page_numbers(self, releases: tuple[str]) -> tuple[int]:
