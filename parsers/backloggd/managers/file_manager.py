@@ -6,7 +6,7 @@ import json
 class FileManager:
     def __init__(self):
         self.data_file_name: str | None = ''
-        self.settings_file_name: str | None = ''
+        self.checkpoint_file_name: str | None = ''
         self.file_size: int | None = None
         self.number_of_records: int | None = None
 
@@ -23,7 +23,7 @@ class FileManager:
             self.file_size = os.path.getsize(self.data_file_name)
 
     async def set_configuration_file_name(self, file_name: str | None):
-        self.settings_file_name = file_name
+        self.checkpoint_file_name = file_name
 
     def create_data_file(self):
         with open(self.data_file_name, 'w', newline='', encoding='utf-8') as csvfile:
@@ -56,11 +56,16 @@ class FileManager:
         self.file_size = os.path.getsize(self.data_file_name)
         self.number_of_records += len(records)
 
-    def write_checkpoint(self, configuration: dict):
-        if self.settings_file_name:
-            with open(self.settings_file_name, 'w') as json_file:
-                settings = self.for_json() | configuration
-                json_file.write(json.dumps(settings, indent=4))
+    def write_checkpoint(self, checkpoint: dict):
+        if self.checkpoint_file_name:
+            with open(self.checkpoint_file_name, 'w') as json_file:
+                checkpoint = self.for_json() | checkpoint
+                json_file.write(json.dumps(checkpoint, indent=4))
+
+    @staticmethod
+    def load_checkpoint(checkpoint_file_name: str) -> dict:
+        with open(checkpoint_file_name, 'r') as json_file:
+            return json.loads(json_file.read())
 
     def for_json(self) -> dict:
         return {'data_file_name': self.data_file_name}

@@ -91,4 +91,4 @@ class ProgressManager:
                 f'{self.overall_progress_bar.for_print("overall")}')
 
     def for_json(self) -> dict:
-        return self.progress
+        return {'progress': self.progress}

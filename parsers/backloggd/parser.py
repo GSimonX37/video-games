@@ -230,6 +230,11 @@ class Parser:
         settings = self.progress_manager.for_json() | self.network_manager.for_json()
         self.file_manager.write_checkpoint(settings)
 
+    async def load_checkpoint(self, checkpoint_file_name: str):
+        settings = self.file_manager.load_checkpoint(checkpoint_file_name)
+        await self.file_manager_setting(settings['data_file_name'], 'a', checkpoint_file_name)
+        await self.progress_manager_setting([*settings['progress'].keys()], [*settings['progress'].values()])
+
     async def print_status(self):
         os.system('cls')
 
