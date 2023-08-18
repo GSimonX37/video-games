@@ -54,9 +54,9 @@ class Parser:
                 await self.print_status()
                 await self.save_checkpoint()
 
-    async def settings(self, data_file_name: str, mode: str, checkpoint_file_name: str = 'checkpoint.json',
-                       releases: list | str = None, pages: list = None,
-                       delay: [int, int] = (5, 10)):
+    async def setting(self, data_file_name: str, mode: str, checkpoint_file_name: str = 'checkpoint.json',
+                      releases: list | str = None, pages: list = None,
+                      delay: [int, int] = (5, 10)):
         await self.file_manager_setting(data_file_name, mode, checkpoint_file_name)
         await self.progress_manager_setting(releases, pages)
         await self.network_manager_setting(delay)
@@ -227,7 +227,7 @@ class Parser:
         await self.network_manager.session.close()
 
     async def save_checkpoint(self):
-        settings = self.progress_manager.for_json()
+        settings = self.progress_manager.for_json() | self.network_manager.for_json()
         self.file_manager.write_checkpoint(settings)
 
     async def print_status(self):

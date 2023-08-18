@@ -66,6 +66,9 @@ class NetworkManager:
     def get_link_page(self, release: str):
         return f'{self.url}/games/lib/release:asc/release_year:released;category:{self.releases[release]}'
 
+    def for_json(self) -> dict:
+        return {'request_delay': self.delay_manager.request_delay}
+
     def for_print(self) -> str:
         failed = ''
         for (status, count) in self.statuses["failed"].items():
