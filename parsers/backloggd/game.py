@@ -20,7 +20,12 @@ class Game:
         self.wishlists: int | None = None
         self.description: str | None = None
 
+    def __bool__(self):
+        return any([getattr(self, attribute) for attribute in self.__dict__ if attribute != 'release'])
+
     async def basic_data_parsing(self, soup):
+        soup = soup.find('div', class_='row', id='game-profile')
+
         await self.get_name(soup)
         await self.get_date(soup)
         await self.get_companies(soup)

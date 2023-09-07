@@ -206,7 +206,6 @@ class Parser:
             if status == 200:
                 text = response['body']
                 soup = BeautifulSoup(text, 'html.parser')
-                soup = soup.find('div', class_='row', id='game-profile')
                 await game.basic_data_parsing(soup)
 
                 status, link_to_statistic = None, link_to_game.replace('games', 'logs') + 'plays/'

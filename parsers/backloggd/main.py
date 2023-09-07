@@ -1,5 +1,6 @@
 import asyncio
 import os
+
 from parser import Parser
 
 
@@ -11,7 +12,7 @@ async def main():
             await parser.load_checkpoint('checkpoint.json')
         else:
             await parser.file_manager_setting('output.csv', 'w')
-            await parser.progress_manager_setting('main', [1, 4])
+            await parser.progress_manager_setting()
             await parser.network_manager_setting((5, 10))
 
         await parser.print_status()
