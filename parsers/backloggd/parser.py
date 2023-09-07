@@ -18,12 +18,16 @@ class Parser:
             'main': 'main_game',
             'dlc': 'dlc_addon',
             'expansion': 'expansion',
+            'bundle': 'bundle',
             'standalone_expansion': 'standalone_expansion',
             'mod': 'mod',
+            'episode': 'episode',
+            'season': 'season',
             'remake': 'remake',
             'remaster': 'remaster',
             'expanded': 'expanded_game',
             'port': 'port',
+            'fork': 'fork',
             'pack': 'pack',
             'update': 'game_update'
         }
