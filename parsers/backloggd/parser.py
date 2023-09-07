@@ -52,7 +52,7 @@ class Parser:
                 links_to_games = await self.get_links_to_games(link_page, page)
                 games = await self.get_games_data(links_to_games, release)
 
-                self.file_manager.write_data([game.for_csv() for game in games])
+                self.file_manager.write_data([game.for_csv() for game in games if game])
 
                 self.progress_manager.step()
                 await self.print_status()
