@@ -124,8 +124,11 @@ class Parser:
 
         self.progress_manager.set_progress(progress)
 
-    async def network_manager_setting(self, delay: tuple[int, int] = (5, 10)):
-        await self.network_manager.set_delay(delay)
+    async def network_manager_setting(self,
+                                      normal_delay: tuple[int, int] = (15, 30),
+                                      enlarged_delay: tuple[int, int] = (60, 120),
+                                      threshold: int = 35):
+        await self.network_manager.setting(normal_delay, enlarged_delay, threshold)
 
     async def get_last_page_numbers(self, releases: tuple[str]) -> tuple[int]:
         print('Parser: getting data on the number of pages with video games...', flush=True)

@@ -46,13 +46,15 @@ class NetworkManager:
 
             return response.status
 
-    async def set_delay(self, delay: tuple[int, int]):
-        await self.delay_manager.set_delay(delay)
+    async def setting(self, normal_delay: tuple[int, int], enlarged_delay: tuple[int, int], threshold: int):
+        await self.delay_manager.setting(normal_delay, enlarged_delay, threshold)
 
     async def get(self, link: str, params: dict = None):
         await self.delay_manager.delay()
 
         async with self.session.get(link, params=params) as response:
+            await self.delay_manager.request_status(response.status)
+
             if response.status == 200:
                 self.statuses["successful"] += 1
             else:
@@ -79,7 +81,7 @@ class NetworkManager:
             failed += f'{" "*4}- {status:<6} {count:8};\n'
 
         return (f'incoming traffic size: {self.incoming_traffic_size / 2**20:.2f} MB;\n'
-                f'delay: {self.delay_manager.request_delay[0]} to {self.delay_manager.request_delay[1]}\n'
+                f'{self.delay_manager.for_print()};\n'
                 f'{"successful":10} {self.statuses["successful"]:10};\n'
                 f'{"failed":10} {sum(self.statuses["failed"].values()):10};\n'
                 f'{failed}'
