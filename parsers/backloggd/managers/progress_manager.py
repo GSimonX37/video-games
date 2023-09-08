@@ -50,7 +50,7 @@ class ProgressManager:
         self.release_progress_bar = ProgressBar()
         self.overall_progress_bar = ProgressBar()
 
-    def set_progress(self, progress: dict[str: list[int, int]]):
+    def setting(self, progress: dict[str: list[int, int]]):
         self.progress = progress
         self.finished = {release: [current_page - 1, last_page]
                          for release, (current_page, last_page) in progress.items()}

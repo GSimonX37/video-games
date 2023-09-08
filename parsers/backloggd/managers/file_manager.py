@@ -10,8 +10,9 @@ class FileManager:
         self.file_size: int | None = None
         self.number_of_records: int | None = None
 
-    async def set_data_file_name(self, file_name: str, mode: str):
-        self.data_file_name = file_name
+    async def setting(self, data_file_name: str, mode: str, checkpoint_file_name: str | None):
+        self.data_file_name = data_file_name
+        self.checkpoint_file_name = checkpoint_file_name
 
         if mode == 'w':
             self.create_data_file()
@@ -21,9 +22,6 @@ class FileManager:
                 self.number_of_records = sum([1 for _ in rows]) - 1
 
             self.file_size = os.path.getsize(self.data_file_name)
-
-    async def set_configuration_file_name(self, file_name: str | None):
-        self.checkpoint_file_name = file_name
 
     def create_data_file(self):
         with open(self.data_file_name, 'w', newline='', encoding='utf-8') as csvfile:

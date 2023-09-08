@@ -58,18 +58,28 @@ class Parser:
                 await self.print_status()
                 await self.save_checkpoint()
 
-    async def setting(self, data_file_name: str, mode: str, checkpoint_file_name: str = 'checkpoint.json',
-                      releases: list | str = None, pages: list = None,
-                      delay: [int, int] = (5, 10)):
+    async def setting(self,
+                      data_file_name: str,
+                      mode: str,
+                      checkpoint_file_name: str = 'checkpoint.json',
+                      releases: list | str = None,
+                      pages: list = None,
+                      normal_delay: tuple[int, int] = (15, 30),
+                      enlarged_delay: tuple[int, int] = (60, 120),
+                      threshold: int = 35):
         await self.file_manager_setting(data_file_name, mode, checkpoint_file_name)
         await self.progress_manager_setting(releases, pages)
-        await self.network_manager_setting(delay)
+        await self.network_manager_setting(normal_delay, enlarged_delay, threshold)
 
-    async def file_manager_setting(self, data_file_name: str, mode: str, checkpoint_file_name: str = 'checkpoint.json'):
-        await self.file_manager.set_data_file_name(data_file_name, mode)
-        await self.file_manager.set_configuration_file_name(checkpoint_file_name)
+    async def file_manager_setting(self,
+                                   data_file_name: str,
+                                   mode: str,
+                                   checkpoint_file_name: str = 'checkpoint.json'):
+        await self.file_manager.setting(data_file_name, mode, checkpoint_file_name)
 
-    async def progress_manager_setting(self, releases: list | str = None, pages: list = None):
+    async def progress_manager_setting(self,
+                                       releases: list | str = None,
+                                       pages: list = None):
         progress = {}
 
         if releases or pages:
@@ -122,7 +132,7 @@ class Parser:
             last_pages = await self.get_last_page_numbers((*self.releases.keys(),))
             progress = {release: [1, last_page] for release, last_page in zip(self.releases.keys(), last_pages)}
 
-        self.progress_manager.set_progress(progress)
+        self.progress_manager.setting(progress)
 
     async def network_manager_setting(self,
                                       normal_delay: tuple[int, int] = (15, 30),
