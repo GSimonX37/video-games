@@ -32,7 +32,11 @@ class Parser:
             'update': 'game_update'
         }
 
-    async def connect(self):
+    async def connect(self) -> int:
+        """
+        Checks the presence of a connection to a web resource.
+        :return: web resource connection status.
+        """
         print('Parser: server connection...', flush=True)
 
         if (status := await self.network_manager.connect()) == 200:
@@ -65,21 +69,46 @@ class Parser:
                       releases: list | str = None,
                       pages: list = None,
                       normal_delay: tuple[int, int] = (15, 30),
-                      enlarged_delay: tuple[int, int] = (60, 120),
-                      threshold: int = 35):
+                      increased_delay: tuple[int, int] = (60, 120),
+                      threshold: int = 35) -> None:
+        """
+        Configures all managers.
+        :param data_file_name: full name of the data file being written.
+        :param mode: file opening mode ("w" - create a new file, "a" - add data to an existing file).
+        :param checkpoint_file_name: full name of the checkpoint file in JSON format.
+        :param releases: video game releases.
+        :param pages: range of video game pages.
+        :param normal_delay: normal delay before sending a request to a web resource.
+        :param increased_delay: increased delay before sending a request to a web resource.
+        :param threshold: threshold of successful requests, exceeding which, the delay returns to normal.
+        :return: None.
+        """
         await self.file_manager_setting(data_file_name, mode, checkpoint_file_name)
         await self.progress_manager_setting(releases, pages)
-        await self.network_manager_setting(normal_delay, enlarged_delay, threshold)
+        await self.network_manager_setting(normal_delay, increased_delay, threshold)
 
     async def file_manager_setting(self,
                                    data_file_name: str,
                                    mode: str,
-                                   checkpoint_file_name: str = 'checkpoint.json'):
+                                   checkpoint_file_name: str = 'checkpoint.json') -> None:
+        """
+        Configures the file manager.
+        :param data_file_name: full name of the data file being written.
+        :param mode: file opening mode ("w" - create a new file, "a" - add data to an existing file).
+        :param checkpoint_file_name: full name of the checkpoint file in JSON format.
+        :return: None.
+        """
         await self.file_manager.setting(data_file_name, mode, checkpoint_file_name)
 
     async def progress_manager_setting(self,
                                        releases: list | str = None,
-                                       pages: list = None):
+                                       pages: list = None) -> None:
+        """
+        Configures the progress manager.
+        :param releases: video game releases.
+        :param pages: range of video game pages.
+        :return: None
+        """
         progress = {}
 
         if releases or pages:
@@ -136,11 +165,23 @@ class Parser:
 
     async def network_manager_setting(self,
                                       normal_delay: tuple[int, int] = (15, 30),
-                                      enlarged_delay: tuple[int, int] = (60, 120),
-                                      threshold: int = 35):
-        await self.network_manager.setting(normal_delay, enlarged_delay, threshold)
+                                      increased_delay: tuple[int, int] = (60, 120),
+                                      threshold: int = 35) -> None:
+        """
+        Configures the network manager.
+        :param normal_delay: normal delay before sending a request to a web resource.
+        :param increased_delay: increased delay before sending a request to a web resource.
+        :param threshold: threshold of successful requests, exceeding which, the delay returns to normal.
+        :return: None.
+        """
+        await self.network_manager.setting(normal_delay, increased_delay, threshold)
 
     async def get_last_page_numbers(self, releases: tuple[str]) -> tuple[int]:
+        """
+        Requests the last page numbers of the specified video game releases.
+        :param releases: list of video game releases.
+        :return: list of recent pages with video games.
+        """
         print('Parser: getting data on the number of pages with video games...', flush=True)
         tasks = []
 
@@ -159,6 +200,11 @@ class Parser:
         return numbers_of_pages
 
     async def get_last_page_number(self, link: str) -> None | int:
+        """
+        Requests the last page number of a video game release from the specified link.
+        :param link: link to video games one from the release.
+        :return: last page with video games.
+        """
         status, number, number_attempts = None, None, 0
 
         while status != 200 and number_attempts < 5:
@@ -172,6 +218,12 @@ class Parser:
         return number
 
     async def get_links_to_games(self, link: str, page: int) -> list[str]:
+        """
+        Requests links to video game pages from a web resource.
+        :param link: link to video games page.
+        :param page: page number.
+        :return: list of links to video game pages.
+        """
         status = None
         links = []
 
@@ -191,8 +243,13 @@ class Parser:
 
         return links
 
-    async def get_games_data(self, links_to_games: list[str], release: str):
-
+    async def get_games_data(self, links_to_games: list[str], release: str) -> tuple[Game]:
+        """
+        Retrieves data about video games from specified links.
+        :param links_to_games: video game links.
+        :param release: video game release.
+        :return: tuple with video game data.
+        """
         tasks = []
 
         for link_to_games in links_to_games:
@@ -203,6 +260,12 @@ class Parser:
         return games
 
     async def get_game_data(self, link_to_game: str, release: str) -> Game:
+        """
+        Retrieves data about a video game from the specified link.
+        :param link_to_game: video game link.
+        :param release: video game release.
+        :return: video game data.
+        """
         status, number_attempts = None, 0
         game = Game(release)
 
@@ -239,19 +302,36 @@ class Parser:
 
         return game
 
-    async def close_connection(self):
+    async def close_connection(self) -> None:
+        """
+        Close the session.
+        :return: None.
+        """
         await self.network_manager.session.close()
 
-    async def save_checkpoint(self):
+    async def save_checkpoint(self) -> None:
+        """
+        Writes the checkpoint to a file.
+        :return: None.
+        """
         settings = self.progress_manager.for_json() | self.network_manager.for_json()
         self.file_manager.write_checkpoint(settings)
 
-    async def load_checkpoint(self, checkpoint_file_name: str):
+    async def load_checkpoint(self, checkpoint_file_name: str) -> None:
+        """
+        Load a checkpoint from a file.
+        :param checkpoint_file_name: full file name with checkpoint.
+        :return: None.
+        """
         settings = self.file_manager.load_checkpoint(checkpoint_file_name)
         await self.file_manager_setting(settings['data_file_name'], 'a', checkpoint_file_name)
         await self.progress_manager_setting([*settings['progress'].keys()], [*settings['progress'].values()])
 
-    async def print_status(self):
+    async def print_status(self) -> None:
+        """
+        Prints the current status to the screen.
+        :return: None.
+        """
         os.system('cls')
 
         print(f'File manager:\n'

@@ -46,8 +46,8 @@ class NetworkManager:
 
             return response.status
 
-    async def setting(self, normal_delay: tuple[int, int], enlarged_delay: tuple[int, int], threshold: int):
-        await self.delay_manager.setting(normal_delay, enlarged_delay, threshold)
+    async def setting(self, normal_delay: tuple[int, int], increased_delay: tuple[int, int], threshold: int):
+        await self.delay_manager.setting(normal_delay, increased_delay, threshold)
 
     async def get(self, link: str, params: dict = None):
         await self.delay_manager.delay()
