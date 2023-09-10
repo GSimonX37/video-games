@@ -1,11 +1,10 @@
 import asyncio
 import os
 
-from bs4 import BeautifulSoup
-
 from game import Game
 from managers.file_manager import FileManager
 from managers.network_manager.network_manager import NetworkManager
+from managers.parsing_manager import ParsingManager
 from managers.progress_manager import ProgressManager
 
 
@@ -13,6 +12,7 @@ class Parser:
     def __init__(self):
         self.file_manager = FileManager()
         self.network_manager = NetworkManager()
+        self.parsing_manager = ParsingManager()
         self.progress_manager = ProgressManager()
         self.releases: dict[str, str] = {
             'main': 'main_game',
@@ -212,8 +212,8 @@ class Parser:
             status, number_attempts = response['status'], number_attempts + 1
 
             if status == 200:
-                soup = BeautifulSoup(response['body'], 'html.parser')
-                number = int(soup.find_all('span', class_='page')[-2].next.text)
+                text = response['body']
+                number = await self.parser_manager.get_last_page_number(text)
 
         return number
 
@@ -233,11 +233,7 @@ class Parser:
 
             if status == 200:
                 text = response['body']
-                soup = BeautifulSoup(text, 'html.parser')
-                html = soup.find_all('a', class_='cover-link')
-                for a in html:
-                    name = a['href'].split('/')[2]
-                    links.append(f'{self.network_manager.url}/games/{name}/')
+                links = await self.parser_manager.get_links_to_games(self.network_manager.url, text)
 
                 await self.print_status()
 
@@ -281,8 +277,7 @@ class Parser:
 
             if status == 200:
                 text = response['body']
-                soup = BeautifulSoup(text, 'html.parser')
-                await game.basic_data_parsing(soup)
+                await self.parser_manager.basic_data_parsing(game, text)
 
                 status, link_to_statistic = None, link_to_game.replace('games', 'logs') + 'plays/'
                 while status != 200:
@@ -297,8 +292,7 @@ class Parser:
 
                     if status == 200:
                         text = response['body']
-                        soup = BeautifulSoup(text, 'html.parser')
-                        await game.get_statistic(soup)
+                        await self.parser_manager.get_statistic(game, text)
 
         return game
 
