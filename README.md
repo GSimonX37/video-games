@@ -123,6 +123,32 @@ Collect data about video games from various open sources. Analyze the distributi
     </tbody>     
 </table>
 
+<br>
+
+<table>
+    <caption><b>Description of data files</b></caption>
+    <thead>
+        <tr>
+            <th>File name</th>
+            <th>File description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{data}_raw</td>
+            <td>Raw data received from the parser, without any processing.</td>
+        </tr>
+        <tr>
+            <td>{data}</td>
+            <td>Data that has undergone preliminary cleaning and is suitable for exploratory data analysis.</td>
+        </tr>
+        <tr>
+            <td>{data}_preprocessed</td>
+            <td>Data after exploratory analysis.</td>
+        </tr>
+    </tbody>     
+</table>
+
 ## Thanks
 I would like to express my gratitude to [Irina Romanovsky](https://www.linkedin.com/in/irina-romanovsky-034338143/) ([GitHub](https://github.com/needsomecats)) for her help and support in creating this project.
 
