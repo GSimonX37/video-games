@@ -213,7 +213,7 @@ class Parser:
 
             if status == 200:
                 text = response['body']
-                number = await self.parser_manager.get_last_page_number(text)
+                number = await self.parsing_manager.get_last_page_number(text)
 
         return number
 
@@ -233,7 +233,7 @@ class Parser:
 
             if status == 200:
                 text = response['body']
-                links = await self.parser_manager.get_links_to_games(self.network_manager.url, text)
+                links = await self.parsing_manager.get_links_to_games(self.network_manager.url, text)
 
                 await self.print_status()
 
@@ -277,7 +277,8 @@ class Parser:
 
             if status == 200:
                 text = response['body']
-                await self.parser_manager.basic_data_parsing(game, text)
+                await self.parsing_manager.basic_data_parsing(game, text)
+                await self.print_status()
 
                 status, link_to_statistic = None, link_to_game.replace('games', 'logs') + 'plays/'
                 while status != 200:
@@ -292,7 +293,8 @@ class Parser:
 
                     if status == 200:
                         text = response['body']
-                        await self.parser_manager.get_statistic(game, text)
+                        await self.parsing_manager.get_statistic(game, text)
+                        await self.print_status()
 
         return game
 
@@ -318,8 +320,17 @@ class Parser:
         :return: None.
         """
         settings = self.file_manager.load_checkpoint(checkpoint_file_name)
-        await self.file_manager_setting(settings['data_file_name'], 'a', checkpoint_file_name)
-        await self.progress_manager_setting([*settings['progress'].keys()], [*settings['progress'].values()])
+
+        await self.file_manager_setting(settings['data_file_name'],
+                                        'a',
+                                        checkpoint_file_name)
+
+        await self.progress_manager_setting([*settings['progress'].keys()],
+                                            [*settings['progress'].values()])
+
+        await self.network_manager_setting(settings['request_delay']['normal'],
+                                           settings['request_delay']['increased'],
+                                           settings['threshold'])
 
     async def print_status(self) -> None:
         """
@@ -332,5 +343,7 @@ class Parser:
               f'{self.file_manager.for_print()}\n\n'
               f'Network manager:\n'
               f'{self.network_manager.for_print()}\n\n'
+              f'Parsing manager:\n'
+              f'{self.parsing_manager.for_print()}\n\n'
               f'Progress manager:\n'
               f'{self.progress_manager.for_print()}')

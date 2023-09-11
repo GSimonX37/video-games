@@ -80,11 +80,11 @@ class ProgressManager:
     def for_print(self) -> str:
         releases, total_current, total_last = '', 0, 0
         for release, (current_page, last_page) in self.finished.items():
-            releases += f'{release:20} {current_page:5} of {last_page:5};\n'
+            releases += f'{release:20} {current_page:5} of {last_page:5} - {current_page / last_page:.2%};\n'
 
         total_current = sum([current_page for (current_page, last_page) in self.finished.values()])
         total_last = sum([last_page for (current_page, last_page) in self.finished.values()])
-        releases += f'{"total":20} {total_current:5} of {total_last:5}.'
+        releases += f'{"total":20} {total_current:5} of {total_last:5} - {total_current / total_last:.2%}.'
 
         return (f'{releases}\n'
                 f'{self.release_progress_bar.for_print("release")}\n'

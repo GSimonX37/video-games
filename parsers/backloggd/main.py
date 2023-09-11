@@ -11,9 +11,9 @@ async def main():
         if os.path.exists('checkpoint.json') and input('Load checkpoint (y/n): ') == 'y':
             await parser.load_checkpoint('checkpoint.json')
         else:
-            await parser.file_manager_setting('output.csv', 'w', 'checkpoint.json')
+            await parser.file_manager_setting('../../data/backloggd/backloggd_raw.csv', 'w', 'checkpoint.json')
             await parser.progress_manager_setting()
-            await parser.network_manager_setting((5, 10), (60, 120), 35)
+            await parser.network_manager_setting((15, 25), (60, 120), 35)
 
         await parser.print_status()
         if not input('Press enter to start...'):
