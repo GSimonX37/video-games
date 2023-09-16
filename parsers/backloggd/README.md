@@ -6,6 +6,12 @@ The parser is written using the aiohttp HTTP client library, which makes it poss
 
 The parser itself consists of 5 managers, each of which performs its own tasks:
 <ol>
+    <li>Parsing manager.
+        <ul>
+            <li>parses html pages received from a web resource;</li>
+            <li>parsing html pages received from a web resource.</li>
+        </ul>
+    </li>
     <li>Progress manager.
         <ul>
             <li>progress update;</li>
@@ -47,6 +53,7 @@ An example code that will allow you to extract data from a site looks like this:
 ``` python
 import asyncio
 import os
+
 from parser import Parser
 
 
@@ -57,9 +64,9 @@ async def main():
         if os.path.exists('checkpoint.json') and input('Load checkpoint (y/n): ') == 'y':
             await parser.load_checkpoint('checkpoint.json')
         else:
-            await parser.file_manager_setting('output.csv', 'w')
-            await parser.progress_manager_setting('main', [1, 4])
-            await parser.network_manager_setting((5, 10))
+            await parser.file_manager_setting('../../data/backloggd/backloggd_raw.csv', 'w', 'checkpoint.json')
+            await parser.progress_manager_setting()
+            await parser.network_manager_setting((15, 20), (60, 120), 35)
 
         await parser.print_status()
         if not input('Press enter to start...'):
@@ -86,15 +93,25 @@ if os.path.exists('checkpoint.json') and input('Load checkpoint (y/n): ') == 'y'
 ```
 Before starting the scraping process, it is necessary to configure the parser managers by calling the following functions:
 ``` python
-await parser.file_manager_setting('output.csv', 'w')
-await parser.progress_manager_setting('main', [1, 4])
-await parser.network_manager_setting((5, 10))
+await parser.file_manager_setting('../../data/backloggd/backloggd_raw.csv', 'w', 'checkpoint.json')
+await parser.progress_manager_setting()
+await parser.network_manager_setting((15, 20), (60, 120), 35)
 ```  
 ## Setting up parser managers
 ### File manager
-To configure the file manager, you need to call the configure_file_manager() method of the Parser class and pass two arguments to it: the complete file name and the mode of working with the file. For example:
+To configure the file manager, you need to call the `file_manager_setting()` method of the Parser class and pass the following arguments to it:
+- `data_file_name` - full name of the data file being written;
+- `mode` - file opening mode (`"w"` - create a new file, `"a"` - add data to an existing file);
+- `checkpoint_file_name` - full name of the checkpoint file in JSON format.
 ``` python
 await parser.file_manager_setting('output.csv', 'w')
+```
+The method definition looks like this:
+``` python
+async def file_manager_setting(self,
+                               data_file_name: str,
+                               mode: str,
+                               checkpoint_file_name: str = 'checkpoint.json') -> None:
 ```
 This setting will create a new file (**overwrite the existing one**) named output.csv. This syntax is similar to calling a built-in function [open()](https://docs.python.org/3/library/functions.html#open). 
 If you need to continue writing data to an existing file, and at the same time, do not delete the entries in it, you must pass the character `a` as the mode of operation:
@@ -102,7 +119,7 @@ If you need to continue writing data to an existing file, and at the same time, 
 await parser.file_manager_setting('output.csv', 'a')
 ```
 By default, after a successfully processed page, the program saves the current progress to the checkpoint.json file. This is necessary so that in the event of an interrupted data collection process, you can continue from the last successfully processed page.
-If you need to assign a different name to the checkpoint file, pass the new file name as the third argument (checkpoint_file_name) to the `parser.file_manager_setting()` method. 
+If you need to assign a different name to the checkpoint file, pass the new file name as the third argument (checkpoint_file_name) to the `.file_manager_setting()` method. 
 ``` python
 await parser.file_manager_setting('output.csv', 'a', 'my_point.json')
 ```
@@ -111,11 +128,23 @@ If there is no need to save the checkpoint, pass the constant `None`.
 await parser.file_manager_setting('output.csv', 'a', None)
 ```
 ### Progress manager
-To generate data scraping tasks, you need to call the configure_progress_manager() method of the Parser class:
+To generate data parsing tasks, you need to call the `.progress_manager_setting()` method of the Parser class with the following arguments:
+- `releases` - video game releases;
+- `pages` - range of video game pages.
+``` python
+await parser.progress_manager_setting(['main', 'dlc'], [[1, 50], [10, 20]])
+```
+The method definition looks like this:
+``` python
+async def progress_manager_setting(self,
+                                   releases: list | str = None,
+                                   pages: list = None) -> None:
+```
+If no arguments were passed when calling the method, the parser will request data from the server about the number of pages with video games for each category of releases, in this case, **all pages** of the page **of each release category** will be subject to scraping. 
 ``` python
 await parser.progress_manager_setting()
 ```
-If no arguments were passed when calling the method, the parser will request data from the server about the number of pages with video games for each category of releases, in this case, **all pages** of the page **of each release category** will be subject to scraping. If you want to get data for only some release categories, you must pass a list of the categories of interest as the releases argument. For example, if you call the configure_progress_manager() method with the following argument, the parser will get data from **all pages** for the **main** and **dlc** release categories:
+If you want to get data for only some release categories, you must pass a list of the categories of interest as the releases argument. For example, if you call the `.progress_manager_setting()` method with the following argument, the parser will get data from **all pages** for the **main** and **dlc** release categories:
 ``` python
 await parser.progress_manager_setting(releases=['main', 'dlc'])
 ```
@@ -123,7 +152,7 @@ Also, you can pass only one release category as an argument:
 ``` python
 await parser.progress_manager_setting(releases='main')
 ```
-If you need to get data not from all pages, but only from pages in a certain range, you must pass the appropriate argument to the configure_progress_manager() method. For example, if you call the configure_progress_manager() method with the following argument, the parser will get data from pages 1 to 25 for each release category:
+If you need to get data not from all pages, but only from pages in a certain range, you must pass the appropriate argument to the `.progress_manager_setting()` method. For example, if you call the `.progress_manager_setting()` method with the following argument, the parser will get data from pages 1 to 25 for each release category:
 ``` python
 await parser.progress_manager_setting(pages=[1, 25])
 ```
@@ -131,7 +160,7 @@ If you need to get data from a specific page to the last existing one, you need 
 ``` python
 await parser.progress_manager_setting(pages=[1, None])
 ```
-You can pass the releases and pages arguments at the same time to the configure_progress_manager() method. In the following example, video game data will be retrieved for the **main** and **dlc** release categories on pages **1 to 50** and **10 to 20**, respectively:
+You can pass the releases and pages arguments at the same time to the `.progress_manager_setting()` method. In the following example, video game data will be retrieved for the **main** and **dlc** release categories on pages **1 to 50** and **10 to 20**, respectively:
 ``` python
 await parser.progress_manager_setting(releases=['main', 'dlc'], pages=[[1, 50], [10, 20]])
 ```
@@ -144,10 +173,20 @@ Also, when passing the releases and pages arguments at the same time, you can us
 await parser.progress_manager_setting(releases=['main', 'dlc'], pages=[[1, 50], [10, None]])
 ```
 ### Network manager
-To configure the network manager, call the configure_network_manager method of the Parser class and pass one argument to it - the delay range:
+To configure the network manager, call the `.network_manager_setting()` method of the Parser class and pass it three arguments:
+- `normal_delay` - normal delay before sending a request to a web resource;
+- `increased_delay` - increased delay before sending a request to a web resource;
+- `threshold` - threshold of successful requests, exceeding which, the delay returns to normal.
 ``` python
-await parser.network_manager_setting((15, 20))
-```  
+await parser.network_manager_setting((15, 20), (60, 120), 35)
+```
+The method definition looks like this:
+``` python
+async def network_manager_setting(self,
+                                  normal_delay: tuple[int, int] = (15, 30),
+                                  increased_delay: tuple[int, int] = (60, 120),
+                                  threshold: int = 35) -> None:
+```
 This method will pass to the network manager, which in turn will pass to the delay manager, a range of integers that will be used when generating a **random delay** before sending a request to the server. This approach is necessary in order not to exceed the request limit, otherwise the server will return responses with a status of **429**. It makes sense to reduce the delay range when using a proxy.
 
 [Project information](../../README.md)
