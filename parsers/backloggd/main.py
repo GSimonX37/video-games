@@ -13,7 +13,7 @@ async def main():
         else:
             await parser.file_manager_setting('../../data/backloggd/backloggd_raw.csv', 'w', 'checkpoint.json')
             await parser.progress_manager_setting()
-            await parser.network_manager_setting((15, 25), (60, 120), 35)
+            await parser.network_manager_setting((15, 20), (60, 120), 35)
 
         await parser.print_status()
         if not input('Press enter to start...'):

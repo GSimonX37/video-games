@@ -53,6 +53,7 @@ class ProgressManager:
     def setting(self, progress: dict[str: list[int, int]]):
         self.progress = progress
         self.finished = {release: [current_page - 1, last_page]
+                         if current_page != last_page else [current_page, last_page]
                          for release, (current_page, last_page) in progress.items()}
         for (release, (current, last)) in self.finished.items():
             if current != last:
